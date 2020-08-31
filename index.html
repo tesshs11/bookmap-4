@@ -1,7 +1,284 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta charset='utf-8' />
+<title>book map 4</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.2/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.2/mapbox-gl.css' rel='stylesheet' />
+<style>
+
+body { 
+margin:0; 
+padding:0; 
+}
+
+.title {
+font-family: "Baskerville";
+font-size: 40px;
+text-align: left;
+color: black;
+display: inline-block;
+margin: 20px 20px 20px 20px;
+}
+
+.btn {
+display: inline-block;
+position: relative;
+margin: 22px 10px 22px 10px;
+width: 150px;
+height: 42px;
+padding: 10px;
+border: none;
+border-radius: 20px;
+font-family: "Baskerville";
+font-size: 18px;
+text-align: center;
+color: #fff;
+background-color: #EC3341;
+}
+
+.btn:hover {opacity: 0.6}
+
+.btn-group {
+margin: auto;
+flex-direction:row;
+float: right;
+margin-right: 15px;
+}
+
+#map { 
+position: relative; 
+top:0; 
+bottom:0; 
+width: 100%;
+}
+
+.popup-container {
+  display: grid;
+  width: max-content;
+  grid-template-columns: auto auto auto;
+  background-color: black;
+  box-shadow:0 4px 8px 0 #383836, 0 6px 10px 0 #383836;
+}
+.imageholder {
+  position: relative;
+  height: 200px;
+  top: 0;
+  background-color: black;
+}
+
+.textholder {
+  position: relative;
+  height: 200px;
+  max-width: 280px;
+  top: 0;
+  background-color: black;
+}
+
+.mapboxgl-popup-content {
+  font: 400 12px/20px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  background-color: black;
+  padding: 0px;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-bottom-color: #000;
+}
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color:#000;
+}
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+  border-right-color:#000;
+}
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+  border-left-color:#000;
+}
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
+  border-bottom-color:#000;
+}
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+  border-bottom-color:#000;
+}
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
+  border-top-color:#000;
+}
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+  border-top-color:#000;
+}
+
+#image {
+padding: 0;
+height: 200px;
+position:relative; 
+object-fit:cover;
+}
+
+#booktitle {
+color:white;
+font-family: "Baskerville";
+font-weight: normal;
+position: relative; 
+font-size: 25px;
+line-height: 35px;
+margin: 15px 15px 5px 15px;
+}
+
+#bookauthor {
+color:white;
+font-family: "Arial";
+font-size: 14px;
+font-weight: bolder;
+position: relative; 
+border-spacing: 0px;
+padding: 0px;
+margin: 10px 15px 5px 15px;
+}
+
+#country {
+color:white;
+font-family: "Arial";
+font-weight: normal;
+font-size: 12px;
+border-spacing: 2px;
+position: relative; 
+margin: 10px 15px 5px 15px;
+}
+
+#genre {
+color:white;
+font-weight: normal;
+border-spacing: 2px;
+position: absolute; 
+}
+
+</style>
+</head>
+
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+ 
+<h1 class='title' id='move5'>book map</h1>
+<div class=btn-group>
+  <button class="btn" id='move1'>Iran</button>
+  <button class="btn" id='move2'>Maine, USA</button>
+  <button class="btn" id='move3'>Nigeria</button>
+  <button class="btn" id='move4'>United Kingdom</button>
+</div>
+<br>
+
+<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.min.js'></script>
+<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.4.2/mapbox-gl-geocoder.css' type='text/css' />
+<!-- Promise polyfill script required to use Mapbox GL Geocoder in IE 11 -->
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+
+<div id='map' style="width:100%;height:860px"></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoidGVzc2hzMTEiLCJhIjoiY2sxY2xkZTBpMnJvYzNjbmltNG85dnZxbSJ9.Y_wMLXc8EZ36g_2PE6ltsw';
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/tesshs11/ck3v021ez0wsd1coegv1l1r7s', 
+center: [-23.535285, 25.499325],
+zoom: 2
+});
+
+// Add a search bar
+map.addControl(new MapboxGeocoder({
+accessToken: mapboxgl.accessToken,
+mapboxgl: mapboxgl
+}));
+
+// Add a popup
+map.on('click', function(e) {
+var features = map.queryRenderedFeatures(e.point, {
+layers: ['book-map-data-3-1'] // replace this with the name of the layer
+});
+
+if (!features.length) {
+return;
+}
+
+var feature = features[0];
+
+var popup = new mapboxgl.Popup({ 
+    offset: [1, 0],
+    closeButton: false,
+    closeOnClick: true,
+    })
+.setLngLat(feature.geometry.coordinates)
+.setHTML(
+'<div class="popup-container">' +
+  '<div class="imageholder">' + 
+    '<img id="image" src="' + feature.properties.image + '">' + 
+  '</div>' +
+
+  '<div class="textholder">' +
+    '<h2 id="booktitle">' + feature.properties.title + '</h2>' +
+    '<h3 id="bookauthor">' + feature.properties.author + '</h3>' +
+    '<h4 id="country">' + feature.properties.country + '</h4>' + 
+  '</div>' +
+'</div>'
+)
+.addTo(map);
+});
+
+// Change the cursor to a pointer when the mouse is over the places layer.
+map.on('mouseenter', 'book-map-data-3-1', function () {
+map.getCanvas().style.cursor = 'pointer';
+});
+ 
+// Change it back to a pointer when it leaves.
+map.on('mouseleave', 'book-map-data-3-1', function () {
+map.getCanvas().style.cursor = '';
+});
+
+// Zoom to Iran
+document.getElementById('move1').addEventListener('click', function() {
+map.fitBounds([[
+54.105196, 43.159567
+], [
+56.030889, 22.186932
+]]);
+});
+
+// Zoom to Maine
+document.getElementById('move2').addEventListener('click', function() {
+map.fitBounds([[
+-68.748550, 47.896132
+], [
+-68.919279, 42.295435 
+]]);
+});
+
+// Zoom to Nigeria
+document.getElementById('move3').addEventListener('click', function() {
+map.fitBounds([[
+8.663792, 17.083679
+], [
+8.336622, 1.758667
+]]);
+});
+
+// Zoom to United Kingdom
+document.getElementById('move4').addEventListener('click', function() {
+map.fitBounds([[
+-4.702517, 59.548924 
+], [
+-1.374270, 48.782983
+]]);
+});
+
+// Zoom Home
+document.getElementById('move5').addEventListener('click', function() {
+map.fitBounds([[
+-32.037382, 54.143096
+], [
+-14.928447, -39.210302
+]]);
+});
+ 
+</script>
+ 
 </body>
-</html>
+</html> 
